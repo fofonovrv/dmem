@@ -62,6 +62,13 @@ chmod +x dmem.py
 sudo mv dmem.py /usr/local/bin/dmem
 ```
 
+Or download directly with curl:
+```bash
+curl -L https://raw.githubusercontent.com/fofonovrv/dmem/main/dmem.py -o dmem
+chmod +x dmem
+sudo mv dmem /usr/local/bin/dmem
+```
+
 ## Requirements
 - Python 3.6+
 - Docker CLI

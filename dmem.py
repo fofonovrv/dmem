@@ -199,6 +199,10 @@ def colorize_value(value: str, raw: Optional[int], warn: int = 500*1024*1024, cr
     return value
 
 
+def truncate_name(name: str, width: int = 30) -> str:
+    return (name[:width-1] + '…') if len(name) > width else name
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Show Docker container memory usage (RAM and SWAP).",
@@ -301,17 +305,22 @@ COLUMNS:
 
         # Default: table output with color
         if details:
-            print(f"{HEADER}{BOLD}{'CONTAINER':<25} {'ID':<12} {'RAM Used':>12} {'SWAP Used':>12} {'Limit':>12} {'SwapLimit':>12} {'Anon':>12} {'File':>12} {'Shmem':>12} {'RSS':>12}{RESET}")
-            print(f"{HEADER}{'-' * 135}{RESET}")
+            print(f"{HEADER}{BOLD}{'CONTAINER':<31} {'ID':<12} {'RAM Used':>12} {'SWAP Used':>12} {'Limit':>12} {'SwapLimit':>12} {'Anon':>12} {'File':>12} {'Shmem':>12} {'RSS':>12}{RESET}")
+            print(f"{HEADER}{'-' * 171}{RESET}")
         else:
-            print(f"{HEADER}{BOLD}{'CONTAINER':<25} {'ID':<12} {'RAM Used':>12} {'SWAP Used':>12}{RESET}")
-            print(f"{HEADER}{'-' * 70}{RESET}")
+            print(f"{HEADER}{BOLD}{'CONTAINER':<31} {'ID':<12} {'RAM Used':>12} {'SWAP Used':>12}{RESET}")
+            print(f"{HEADER}{'-' * 67}{RESET}")
         for row in rows:
-            ram = colorize_value(row['ram'], row['ram_raw'])
-            swap = colorize_value(row['swap'], row['swap_raw'])
+            # Truncate container name for table output
+            container_str = truncate_name(row['container'], 30)
+            # Format values to width first, then colorize
+            ram_str = f"{row['ram']:>12}"
+            swap_str = f"{row['swap']:>12}"
+            ram = colorize_value(ram_str, row['ram_raw'])
+            swap = colorize_value(swap_str, row['swap_raw'])
             if details:
-                print(f"{row['container']:<25} {row['id']:<12} {ram:>12} {swap:>12} {row['limit']:>12} {row['swaplimit']:>12} {row['anon']:>12} {row['file']:>12} {row['shmem']:>12} {row['rss']:>12}")
+                print(f"{container_str:<31} {row['id']:<12} {ram} {swap} {row['limit']:>12} {row['swaplimit']:>12} {row['anon']:>12} {row['file']:>12} {row['shmem']:>12} {row['rss']:>12}")
             else:
-                print(f"{row['container']:<25} {row['id']:<12} {ram:>12} {swap:>12}")
+                print(f"{container_str:<31} {row['id']:<12} {ram} {swap}")
 
     main(verbose=args.verbose, details=getattr(args, 'details', False), filter_str=getattr(args, 'filter', None), output=getattr(args, 'output', 'table'))
