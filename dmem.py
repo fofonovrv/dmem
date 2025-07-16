@@ -157,7 +157,7 @@ def get_all_containers() -> List[Dict[str, str]]:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True,
-            text=True
+            universal_newlines=True
         )
         containers = []
         for line in result.stdout.strip().splitlines():
