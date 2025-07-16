@@ -13,6 +13,27 @@ A simple yet powerful Python utility to display memory (RAM and SWAP) usage for 
 - **Verbose/debug mode** for troubleshooting
 - **No dependencies except Docker and Python 3**
 
+## Why dmem?
+
+Standard Docker commands like `docker stats` provide a good overview of container resource usage, but they often fall short when you need precise details about **SWAP memory consumption**. For system administrators and DevOps engineers, understanding swap usage is crucial for:
+
+* **Troubleshooting performance issues:** High swap usage can indicate memory pressure and degrade application performance.
+* **Optimizing resource allocation:** Accurately assessing memory needs helps prevent over-provisioning or under-provisioning resources.
+* **Identifying memory leaks:** Unexpected swap growth can signal a memory leak within a containerized application.
+
+`dmem` bridges this gap by directly interacting with Linux cgroups (where container resource statistics are maintained), extracting and presenting comprehensive memory data, including a dedicated SWAP usage column, in an easily digestible format.
+
+## How it works?
+
+`dmem` leverages the power of **Linux cgroups** to gather precise memory statistics. When Docker (or any container runtime) creates a container, it also sets up a dedicated cgroup for it. Inside these cgroups, the kernel maintains detailed accounting of resource usage.
+
+`dmem` performs the following steps:
+1.  It identifies all running Docker containers.
+2.  For each container, it determines its corresponding cgroup path on the host system (supporting both v1 and v2 cgroup hierarchies).
+3.  It then reads specific memory-related files within that cgroup (e.g., `memory.usage_in_bytes`, `memory.swap.current`, `memory.memsw.usage_in_bytes`) to collect accurate RAM and SWAP usage data.
+4.  Finally, it processes this raw data into human-readable formats, including a clear distinction between RAM and SWAP consumption.
+
+
 ## Usage
 ```bash
 python3 dmem.py [OPTIONS]
@@ -74,5 +95,31 @@ sudo mv dmem /usr/local/bin/dmem
 - Docker CLI
 - Linux with cgroup support (v1 or v2)
 
+
+## Tested On
+
+dmem has been tested on the following environments:
+
+- Arch Linux ARM (cgroup v2), Python 3.13.5, Docxker 28.2.0
+- Arch Linux (cgroup v2), Python 3.13.5, Docker 28.3.2
+- Ubuntu 22.04.2 LTS (cgroup v2), Python 3.10.6, Docker 24.0.2
+- CentOS 7 (cgroup v1), Python 3.6.8, Docker 26.1.4
+
+## Contributing
+
+I welcome contributions to dmem! If you have ideas for new features, bug fixes, or improvements, please feel free to:
+
+1. Open an issue: Describe the bug you found or the feature you'd like to see.
+2. Submit a Pull Request: If you've implemented a change, submit a PR with a clear description of your modifications and tests if applicable.  
+
+Please ensure your code adheres to a consistent style and includes appropriate comments.
+
 ## License
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+
+## Contact
+
+For any questions, suggestions, or feedback, you can reach out to the maintainer:
+- GitHub Issues: https://github.com/fofonovrv/dmem/issues
+- fofonovrv@gmail.com
